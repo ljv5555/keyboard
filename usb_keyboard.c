@@ -349,7 +349,7 @@ int8_t usb_keyboard_send(void)
 //
 ISR(USB_GEN_vect)
 {
-	uint8_t intbits, t, i;
+	uint8_t intbits, i;
 	static uint8_t div4=0;
 
         intbits = UDINT;
