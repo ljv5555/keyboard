@@ -8,8 +8,8 @@ int main(void)
 {
     uint8_t number_keys[10] =
         {KEY_0, KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9};
-    uint8_t d, column, row;
-    uint8_t d_prev = 0xFF;
+    uint8_t b, column, row;
+    uint8_t b_prev = 0xFF;
 
     CPU_PRESCALE(0);
 
@@ -32,11 +32,11 @@ int main(void)
     _delay_ms(1000);
 
     while (1) {
-        d = PIND;
+        b = PINB;
         for (column = 0; column < 8; column++) {
             PORTD |= (1 << column);
             for (row = 0; row < 8; row++) {
-                if (((d & (1 << row)) == 0) && (d_prev & (1 << row)) != 0) {
+                if (((b & (1 << row)) == 0) && (b_prev & (1 << row)) != 0) {
                     usb_keyboard_press(number_keys[column], 0);
                     usb_keyboard_press(number_keys[row], 0);
                     usb_keyboard_press(KEY_SPACE, 0);
@@ -44,7 +44,7 @@ int main(void)
             }
             PORTD &= ~(1 << column);
         }
-        d_prev = d;
+        b_prev = b;
         _delay_ms(2);
     }
 }
