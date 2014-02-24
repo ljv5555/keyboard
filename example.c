@@ -8,7 +8,7 @@ int main(void)
 {
     uint8_t number_keys[10] =
         {KEY_0, KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9};
-    uint8_t column, row;
+    uint8_t column, row, mask;
     uint8_t pressed_rows[8];
 
     CPU_PRESCALE(0);
@@ -32,21 +32,24 @@ int main(void)
     _delay_ms(1000);
 
     while (1) {
+
+        mask = 1;
         for (column = 0; column < 8; column++) {
-            PORTD &= ~(1 << column);
+            PORTD &= ~mask;
             for (row = 0; row < 8; row++) {
                 if ((PINB & (1 << row)) == 0) {
-                    if ((pressed_rows[row] & (1 << column)) == 0) {
-                        pressed_rows[row] |= (1 << column);
+                    if ((pressed_rows[row] & mask) == 0) {
+                        pressed_rows[row] |= mask;
                         usb_keyboard_press(number_keys[column], 0);
                         usb_keyboard_press(number_keys[row], 0);
                         usb_keyboard_press(KEY_SPACE, 0);
                     }
                 } else {
-                    pressed_rows[row] &= ~(1 << column);
+                    pressed_rows[row] &= ~mask;
                 }
             }
-            PORTD |= (1 << column);
+            PORTD |= mask;
+            mask = mask << 1;
         }
         _delay_ms(2);
     }
