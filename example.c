@@ -31,6 +31,10 @@ int main(void)
     while (!usb_configured());
     _delay_ms(1000);
 
+    // works perfectly with one column "D"
+    // and multiple rows "B"
+    // but one row and multiple columns multiple keypresses don't work
+
     while (1) {
         for (column = 0; column < 8; column++) {
             PORTD &= ~(1<<column);
