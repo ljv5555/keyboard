@@ -40,18 +40,34 @@ int main(void)
             PORTD &= ~(1<<column);
             _delay_ms(2);
             b = PINB;
+            PORTD |= (1<<column);
             for (row = 0; row < 8; row++) {
                 if ((b & (1<<row)) == 0) {
                     if ((previous_rows[column] & (1<<row)) != 0) {
                         usb_keyboard_press(number_keys[column], 0);
                         usb_keyboard_press(number_keys[row], 0);
                         usb_keyboard_press(KEY_ENTER, 0);
+                        usb_keyboard_press(KEY_ENTER, 0);
                     }
                 }
             }
             previous_rows[column] = b;
-            PORTD |= (1<<column);
         }
+        for (column = 0; column < 8; column++) {
+            x = previous_rows[column];
+            for (row = 0; row < 8; row++) {
+                if ((x & (1<<row)) == 0) {
+                    i = 0;
+                } else {
+                    i = 1;
+                }
+                usb_keyboard_press(number_keys[i], 0);
+            }
+            usb_keyboard_press(KEY_ENTER, 0);
+        }
+        usb_keyboard_press(KEY_ENTER, 0);
+        usb_keyboard_press(KEY_ENTER, 0);
+        _delay_ms(1000);
     }
 }
 
