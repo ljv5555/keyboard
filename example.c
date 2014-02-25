@@ -20,8 +20,8 @@ int main(void)
     // PINx read the pin
 
     // high output
-    DDRD = 0xFF;
-    PORTD = 0xFF;
+    //DDRD = 0xFF;
+    //PORTD = 0xFF;
 
     // pullup resistor input
     DDRB = 0x00;
@@ -35,12 +35,14 @@ int main(void)
     // and multiple rows "B"
     // but one row and multiple columns multiple keypresses don't work
 
+    DDRD = 0x00;
+    PORTD = 0x00;
     while (1) {
         for (column = 0; column < 8; column++) {
-            PORTD &= ~(1<<column);
+            DDRD |= (1<<column);
             _delay_ms(2);
             b = PINB;
-            PORTD |= (1<<column);
+            DDRD &= ~(1<<column);
             for (row = 0; row < 8; row++) {
                 if ((b & (1<<row)) == 0) {
                     if ((previous_rows[column] & (1<<row)) != 0) {
@@ -53,21 +55,6 @@ int main(void)
             }
             previous_rows[column] = b;
         }
-        for (column = 0; column < 8; column++) {
-            x = previous_rows[column];
-            for (row = 0; row < 8; row++) {
-                if ((x & (1<<row)) == 0) {
-                    i = 0;
-                } else {
-                    i = 1;
-                }
-                usb_keyboard_press(number_keys[i], 0);
-            }
-            usb_keyboard_press(KEY_ENTER, 0);
-        }
-        usb_keyboard_press(KEY_ENTER, 0);
-        usb_keyboard_press(KEY_ENTER, 0);
-        _delay_ms(1000);
     }
 }
 
