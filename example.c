@@ -8,8 +8,8 @@ int main(void)
 {
     uint8_t number_keys[10] =
         {KEY_0, KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9};
-    uint8_t column, row;
-    uint8_t pressed_columns, pressed_rows;
+    uint8_t column, row, x, i, z, column_mask, row_mask, b;
+    uint8_t previous_rows[8];
 
     CPU_PRESCALE(0);
 
@@ -18,9 +18,6 @@ int main(void)
     //  DDRx 0 - 0 normal 1 pullup resistor
     //  DDRx 1 - 0 low output 1 high output
     // PINx read the pin
-
-    pressed_columns = 0x00;
-    pressed_rows = 0x00;
 
     // high output
     DDRD = 0xFF;
@@ -36,23 +33,20 @@ int main(void)
 
     while (1) {
         for (column = 0; column < 8; column++) {
-            PORTD &= ~(1 << column);
+            PORTD &= ~(1<<column);
+            _delay_ms(2);
+            b = PINB;
             for (row = 0; row < 8; row++) {
-                if ((PINB & (1 << row)) == 0) {
-                    if (((pressed_columns & (1 << column)) == 0) && ((pressed_rows & (1 << row)) == 0)) {
-                        pressed_columns |= (1 << column);
-                        pressed_rows |= (1 << row);
+                if ((b & (1<<row)) == 0) {
+                    if ((previous_rows[column] & (1<<row)) != 0) {
                         usb_keyboard_press(number_keys[column], 0);
                         usb_keyboard_press(number_keys[row], 0);
-                        usb_keyboard_press(KEY_SPACE, 0);
+                        usb_keyboard_press(KEY_ENTER, 0);
                     }
-                } else if ((pressed_columns & (1 << column)) && (pressed_rows & (1 << row))) {
-                    pressed_columns &= ~(1 << column);
-                    pressed_rows &= ~(1 << row);
                 }
             }
-            PORTD |= (1 << column);
+            previous_rows[column] = b;
+            PORTD |= (1<<column);
         }
-        _delay_ms(2);
     }
 }
