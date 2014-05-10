@@ -31,18 +31,16 @@ int main(void)
     while (!usb_configured());
     _delay_ms(1000);
 
-    // works perfectly with one column "D"
-    // and multiple rows "B"
-    // but one row and multiple columns multiple keypresses don't work
-
     DDRD = 0x00;
     PORTD = 0x00;
     while (1) {
         for (column = 0; column < 8; column++) {
+            // set D to low, read pins B and set it back to high
             DDRD |= (1<<column);
             _delay_ms(2);
             b = PINB;
             DDRD &= ~(1<<column);
+
             for (row = 0; row < 8; row++) {
                 if ((b & (1<<row)) == 0) {
                     if ((previous_rows[column] & (1<<row)) != 0) {
